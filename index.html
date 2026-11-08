@@ -1,0 +1,458 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMAZON LIGHT — Mobile E-Commerce</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            amazon: {
+              orange: '#ff9900',
+              orangeDark: '#e68a00',
+              blue: '#007185',
+              yellow: '#ffd814',
+              yellowHover: '#f7ca00',
+              lightBg: '#f3f3f3',
+              green: '#008a00',
+              darkGreen: '#067d62'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #e3e6e6;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Custom Scrollbar for Horizontal Banners & Categories */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Full-Screen Green Tick Draw Animation */
+    .checkmark-circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 3;
+      stroke-miterlimit: 10;
+      stroke: #ffffff;
+      fill: none;
+      animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+
+    .checkmark-check {
+      transform-origin: 50% 50%;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      animation: stroke 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+    }
+
+    @keyframes stroke {
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes scaleIn {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .animate-scale-in {
+      animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="flex justify-center bg-gray-900 min-h-screen font-sans antialiased text-gray-900">
+
+  <!-- Mobile Viewport Wrapper -->
+  <div class="w-full max-w-md bg-white min-h-screen flex flex-col justify-between shadow-2xl relative overflow-x-hidden pb-16">
+    
+    <!-- Top Sticky Header -->
+    <header class="sticky top-0 z-40 bg-gradient-to-r from-[#ff7e00] to-[#ff9900] shadow-md">
+      <!-- Top Branding Bar -->
+      <div class="px-3 pt-2.5 pb-1 flex items-center justify-between">
+        <!-- AMAZON LIGHT Logo Header with 4-Tap Admin Trigger -->
+        <div onclick="handleLogoTap()" class="cursor-pointer flex items-center space-x-1.5 select-none">
+          <i class="fa-brands fa-amazon text-gray-900 text-xl font-bold"></i>
+          <span class="text-sm font-black text-gray-900 tracking-tight">AMAZON <span class="text-white font-extrabold bg-gray-900/80 px-1.5 py-0.5 rounded text-[11px] uppercase tracking-wider">LIGHT</span></span>
+        </div>
+        <div class="flex items-center space-x-3 text-gray-900 text-sm">
+          <span id="user-display-name" class="text-xs font-bold truncate max-w-[100px]">Hello, Guest</span>
+          <i class="fa-regular fa-bell text-base cursor-pointer" onclick="showToast('No new notifications')"></i>
+        </div>
+      </div>
+
+      <!-- Main Search Bar Area -->
+      <div class="px-3 pb-2 flex items-center space-x-2">
+        <div class="relative flex-1 flex items-center">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 text-gray-500 text-sm"></i>
+          <input type="text" id="global-search-input" onkeyup="handleSearch(this.value)" placeholder="Search Amazon.in" class="w-full pl-9 pr-16 py-2 bg-white text-xs text-gray-900 rounded-md focus:outline-none shadow-inner border border-gray-300">
+          <div class="absolute right-2 flex items-center space-x-2 text-gray-500 text-sm">
+            <i class="fa-solid fa-camera cursor-pointer hover:text-gray-800"></i>
+            <i class="fa-solid fa-qrcode cursor-pointer hover:text-gray-800"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Location Sub-Bar -->
+      <div onclick="navigateTo('address')" class="bg-amber-100/90 px-3 py-1.5 flex items-center space-x-1.5 text-[11px] text-gray-800 border-t border-amber-200 cursor-pointer">
+        <i class="fa-solid fa-location-dot text-gray-700 text-xs"></i>
+        <span id="header-location-text" class="font-medium truncate">Delivering to Jammu 180002 - Update location</span>
+        <i class="fa-solid fa-chevron-down text-[9px] text-gray-600"></i>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Content Container -->
+    <main id="main-content" class="flex-1 bg-[#e3e6e6]">
+      <!-- Views will be dynamically injected here -->
+    </main>
+
+    <!-- Fixed Bottom 5-Tab Navigation -->
+    <nav class="fixed bottom-0 max-w-md w-full bg-white border-t border-gray-300 z-40 flex items-center justify-around py-1.5 px-1 text-gray-700 shadow-lg">
+      <button onclick="navigateTo('home')" id="nav-home" class="flex flex-col items-center flex-1 py-1 text-amazon-orange font-bold">
+        <i class="fa-solid fa-house text-lg"></i>
+        <span class="text-[10px] mt-0.5">Home</span>
+      </button>
+
+      <button onclick="navigateTo('you')" id="nav-you" class="flex flex-col items-center flex-1 py-1 text-gray-600 hover:text-gray-900">
+        <i class="fa-regular fa-user text-lg"></i>
+        <span class="text-[10px] mt-0.5">You</span>
+      </button>
+
+      <button onclick="navigateTo('wallet')" id="nav-wallet" class="flex flex-col items-center flex-1 py-1 text-gray-600 hover:text-gray-900">
+        <i class="fa-solid fa-wallet text-lg"></i>
+        <span class="text-[10px] mt-0.5">Wallet</span>
+      </button>
+
+      <button onclick="navigateTo('cart')" id="nav-cart" class="flex flex-col items-center flex-1 py-1 text-gray-600 hover:text-gray-900 relative">
+        <div class="relative">
+          <i class="fa-solid fa-cart-shopping text-lg"></i>
+          <span id="nav-cart-badge" class="absolute -top-1.5 -right-2.5 bg-rose-600 text-white text-[9px] font-black rounded-full h-4 w-4 flex items-center justify-center">0</span>
+        </div>
+        <span class="text-[10px] mt-0.5">Cart</span>
+      </button>
+
+      <button onclick="navigateTo('menu')" id="nav-menu" class="flex flex-col items-center flex-1 py-1 text-gray-600 hover:text-gray-900">
+        <i class="fa-solid fa-bars text-lg"></i>
+        <span class="text-[10px] mt-0.5">Menu</span>
+      </button>
+    </nav>
+
+    <!-- Full Screen Green Success Animation Screen (Hidden by default) -->
+    <div id="full-green-success-screen" class="fixed inset-0 bg-[#008a00] z-50 hidden flex flex-col items-center justify-center text-white p-6 text-center animate-scale-in">
+      <div class="w-24 h-24 mb-6 relative flex items-center justify-center border-4 border-white rounded-full bg-emerald-700/30 shadow-2xl">
+        <i class="fa-solid fa-check text-5xl text-white"></i>
+      </div>
+
+      <h1 class="text-xl font-black tracking-wide uppercase mb-2">YOUR ORDER HAS BEEN PLACED SUCCESSFULLY!</h1>
+      <p class="text-xs text-emerald-100 mb-6 font-medium">Thank you for shopping with AMAZON LIGHT.</p>
+
+      <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 w-full max-w-xs space-y-2 text-left text-xs mb-8 border border-white/20">
+        <div class="flex justify-between">
+          <span class="opacity-80">Order ID:</span>
+          <span id="success-order-id" class="font-mono font-bold text-amber-300">#AML-8947291</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="opacity-80">Order Date:</span>
+          <span id="success-order-date" class="font-medium">Nov 9, 2026</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="opacity-80">Payment Method:</span>
+          <span class="font-semibold text-emerald-200">Prepaid Online</span>
+        </div>
+      </div>
+
+      <div class="w-full max-w-xs space-y-3">
+        <button onclick="viewOrderTrackingFromSuccess()" class="w-full bg-amber-400 hover:bg-amber-500 text-gray-900 font-extrabold py-3 rounded-full text-xs shadow-lg uppercase tracking-wider">
+          Track Your Order
+        </button>
+        <button onclick="closeSuccessAndGoHome()" class="w-full bg-white/20 hover:bg-white/30 text-white font-bold py-3 rounded-full text-xs backdrop-blur-sm border border-white/30">
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden Admin Password Modal -->
+    <div id="admin-login-modal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-xl max-w-xs w-full p-5 space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center border-b pb-2">
+          <h3 class="font-extrabold text-sm text-gray-900"><i class="fa-solid fa-lock text-amazon-orange mr-1.5"></i> Admin Access Login</h3>
+          <button onclick="closeAdminModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p class="text-xs text-gray-600">Enter secure admin password to unlock management dashboard.</p>
+        <div>
+          <input type="password" id="admin-pass-input" placeholder="Admin Password" class="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-amazon-orange outline-none">
+        </div>
+        <button onclick="verifyAdminPassword()" class="w-full bg-amazon-orange text-white font-bold py-2 rounded-lg text-xs hover:bg-amazon-orangeDark">
+          Login to Dashboard
+        </button>
+      </div>
+    </div>
+
+    <!-- General Toast Notification -->
+    <div id="toast" class="fixed top-14 left-1/2 transform -translate-x-1/2 bg-gray-900/90 text-white text-xs px-4 py-2.5 rounded-full z-50 hidden transition-all duration-300 shadow-lg text-center max-w-xs">
+      Notification text
+    </div>
+
+  </div>
+
+  <script>
+    /* ==========================================================================
+       INITIAL DATA & STATE MANAGEMENT
+       ========================================================================== */
+
+    const DEFAULT_PRODUCTS = [
+      {
+        id: "prod-1",
+        title: "DJI Osmo Action 4 Standard Combo - Waterproof 4K Action Camera",
+        price: 22990,
+        mrp: 44990,
+        discount: 49,
+        rating: 4.8,
+        reviewsCount: 1240,
+        category: "Electronics",
+        inStock: true,
+        image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=500&q=80",
+        description: "1/1.3-inch sensor, stunning low-light imaging, 10-bit & D-Log M color performance, deep freeze resistant & long-lasting battery life."
+      },
+      {
+        id: "prod-2",
+        title: "WHOOP 5.0 / MG Screenless Fitness & Health Tracker Band",
+        price: 27539,
+        mrp: 28990,
+        discount: 5,
+        rating: 4.6,
+        reviewsCount: 890,
+        category: "Fitness",
+        inStock: true,
+        image: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?auto=format&fit=crop&w=500&q=80",
+        description: "Continuous health & strain monitoring, sleep tracking, waterproof fabric band, long battery battery system."
+      },
+      {
+        id: "prod-3",
+        title: "T TOPLINE 5KG To 60KG Adjustable Heavy Hand Grip Strengthener",
+        price: 95,
+        mrp: 499,
+        discount: 81,
+        rating: 4.5,
+        reviewsCount: 1334,
+        category: "Fitness",
+        inStock: true,
+        image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=500&q=80",
+        description: "Non-slip mechanical counter hand exerciser grip. Ideal for forearm workouts, wrist rehabilitation & strength training."
+      },
+      {
+        id: "prod-4",
+        title: "SpinBot BattleBudz W20 Gaming Wired Earphones with Mic",
+        price: 299,
+        mrp: 799,
+        discount: 62,
+        rating: 4.3,
+        reviewsCount: 512,
+        category: "Electronics",
+        inStock: true,
+        image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=500&q=80",
+        description: "Immersive bass drivers, detachable boom microphone, zero latency audio performance for mobile gaming."
+      }
+    ];
+
+    const DEFAULT_REVIEWS = [
+      {
+        id: "rev-1",
+        productId: "prod-3",
+        author: "Amazon Editorial Review",
+        isStoreReview: true,
+        rating: 5,
+        title: "Excellent build quality for daily forearm workouts!",
+        comment: "Tested by Amazon Light team. The spring resistance is accurate from 5kg to 60kg without squeaking."
+      }
+    ];
+
+    const DEFAULT_QR_SETTINGS = {
+      qrUrl: "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=amazonlight@upi&pn=AmazonLightStore",
+      qrTimerSec: 120, // Visible customer countdown (Default 2 mins)
+      popupTimerSec: 15 // Background automatic popup timer (Default 15 secs)
+    };
+
+    // State Variables
+    let currentView = 'home';
+    let selectedProductId = null;
+    let logoTapCount = 0;
+    let logoTapTimer = null;
+    let qrCountdownInterval = null;
+    let popupCountdownInterval = null;
+    let currentActiveOrderId = null;
+    let adminActiveTab = 'qr';
+
+    // LocalStorage Initializations
+    function initData() {
+      if (!localStorage.getItem('aml_products')) {
+        localStorage.setItem('aml_products', JSON.stringify(DEFAULT_PRODUCTS));
+      }
+      if (!localStorage.getItem('aml_cart')) {
+        localStorage.setItem('aml_cart', JSON.stringify([{ productId: 'prod-3', qty: 1 }]));
+      }
+      if (!localStorage.getItem('aml_wishlist')) {
+        localStorage.setItem('aml_wishlist', JSON.stringify([]));
+      }
+      if (!localStorage.getItem('aml_addresses')) {
+        localStorage.setItem('aml_addresses', JSON.stringify([{
+          id: 'addr-1',
+          name: '',
+          mobile: '',
+          flat: '',
+          area: '',
+          landmark: '',
+          pincode: '',
+          city: '',
+          state: '',
+          isDefault: true
+        }]));
+      }
+      if (!localStorage.getItem('aml_orders')) {
+        localStorage.setItem('aml_orders', JSON.stringify([]));
+      }
+      if (!localStorage.getItem('aml_reviews')) {
+        localStorage.setItem('aml_reviews', JSON.stringify(DEFAULT_REVIEWS));
+      }
+      if (!localStorage.getItem('aml_qr_settings')) {
+        localStorage.setItem('aml_qr_settings', JSON.stringify(DEFAULT_QR_SETTINGS));
+      }
+      if (!localStorage.getItem('aml_wallet_balance')) {
+        localStorage.setItem('aml_wallet_balance', '150.00');
+      }
+    }
+
+    // Data Helpers
+    function getProducts() { return JSON.parse(localStorage.getItem('aml_products')) || []; }
+    function setProducts(p) { localStorage.setItem('aml_products', JSON.stringify(p)); }
+    function getCart() { return JSON.parse(localStorage.getItem('aml_cart')) || []; }
+    function setCart(c) { 
+      localStorage.setItem('aml_cart', JSON.stringify(c)); 
+      updateCartBadge();
+    }
+    function getWishlist() { return JSON.parse(localStorage.getItem('aml_wishlist')) || []; }
+    function setWishlist(w) { localStorage.setItem('aml_wishlist', JSON.stringify(w)); }
+    function getAddresses() { return JSON.parse(localStorage.getItem('aml_addresses')) || []; }
+    function getOrders() { return JSON.parse(localStorage.getItem('aml_orders')) || []; }
+    function setOrders(o) { localStorage.setItem('aml_orders', JSON.stringify(o)); }
+    function getQrSettings() { return JSON.parse(localStorage.getItem('aml_qr_settings')) || DEFAULT_QR_SETTINGS; }
+
+    function updateCartBadge() {
+      const cart = getCart();
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      const badge = document.getElementById('nav-cart-badge');
+      if (badge) badge.innerText = count;
+    }
+
+    /* ==========================================================================
+       ROUTING & NAVIGATION
+       ========================================================================== */
+
+    function navigateTo(view, param = null) {
+      currentView = view;
+      if (param) selectedProductId = param;
+      
+      // Reset Navigation Active Colors
+      ['home', 'you', 'wallet', 'cart', 'menu'].forEach(tab => {
+        const btn = document.getElementById(`nav-${tab}`);
+        if (btn) {
+          if (tab === view) {
+            btn.className = "flex flex-col items-center flex-1 py-1 text-amazon-orange font-bold";
+          } else {
+            btn.className = "flex flex-col items-center flex-1 py-1 text-gray-600 hover:text-gray-900";
+          }
+        }
+      });
+
+      // Clear Timers if Leaving Checkout Payment View
+      if (view !== 'payment') {
+        clearInterval(qrCountdownInterval);
+        clearInterval(popupCountdownInterval);
+      }
+
+      window.scrollTo(0, 0);
+
+      // View Router
+      switch(view) {
+        case 'home': renderHomeView(); break;
+        case 'product-details': renderProductDetailsView(selectedProductId); break;
+        case 'cart': renderCartView(); break;
+        case 'address': renderAddressView(); break;
+        case 'payment': renderPaymentView(); break;
+        case 'tracking': renderTrackingView(param); break;
+        case 'wallet': renderWalletView(); break;
+        case 'you': renderYouView(); break;
+        case 'menu': renderMenuView(); break;
+        case 'admin-dashboard': renderAdminDashboard(); break;
+        default: renderHomeView();
+      }
+    }
+
+    /* ==========================================================================
+       1. HOME PAGE VIEW (Pixel-Perfect Recreation of Screenshots 1, 2, 3)
+       ========================================================================== */
+
+    function renderHomeView() {
+      const products = getProducts();
+      
+      const html = `
+        <div class="pb-6">
+          
+          <!-- Quick Category Scroll Pills (Screenshot 2 Top) -->
+          <div class="bg-white py-2 px-2 border-b border-gray-200 flex space-x-2 overflow-x-auto no-scrollbar text-xs">
+            <div class="flex-none bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full font-bold text-gray-800 flex items-center space-x-1">
+              <span class="w-2 h-2 bg-amazon-orange rounded-full"></span>
+              <span>Shop All</span>
+            </div>
+            <div class="flex-none bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full text-gray-700">Mobiles</div>
+            <div class="flex-none bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full text-gray-700">Fashion & Beauty</div>
+            <div class="flex-none bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full text-gray-700">Home & Living</div>
+            <div class="flex-none bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full text-gray-700">Electronics</div>
+            <div class="flex-none bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full text-gray-700">Fitness</div>
+          </div>
+
+          <!-- Promotional Hero Banner (Screenshot 2) -->
+          <div class="p-2">
+            <div class="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl p-4 text-white relative overflow-hidden shadow-sm">
+              <span class="bg-yellow-400 text-gray-900 font-extrabold text-[10px] px-2 py-0.5 rounded uppercase tracking-wider">Fast Festive Days</span>
+  
